@@ -1,53 +1,67 @@
 #include "../../includes/asm.h"
 
-
-void	parse_symbols(t_parser *parser,
-					char *row,
-					unsigned start,
-					t_token *token)
+void	kill(char *s)s
 {
-	unsigned column;
+	if (errno == 0)
+		ft_putendl_fd(s, 2);
+	else
+		perror(s);
+	exit(1);
+}
 
+char	*token_content(t_parser *parser, const char *row, unsigned start)
+{
+	char	*cnt;
+
+	if (!(cnt = ft_strsub(row, start, parser->column - start)))
+		kill("ERROR: Can\'t initialize string");
+	return (cnt);
+}
+
+void	parse_symbols(t_parser *parser, char *row, unsigned start, t_token *token)
+{
+	unsigned int col;
+
+	col = parser->column;
 	token->column = start;
-	column = parser->column;
-	while (row[parser->column]
-		&& ft_strchr(LABEL_CHARS, row[parser->column]))
+	while (ft_strchr(LABEL_CHARS, row[parser->column])
+		&& row[parser->column])
 		parser->column++;
-	if ((parser->column - column) && row[parser->column] == LABEL_CHAR
-		&& ++parser->column)
+	if ((parser->column - col) && ++parser->column
+		&& row[parser->column] == LABEL_CHAR)
 	{
-		token->data = get_token_content(parser, row, start);
 		token->type = LABEL;
+		token->data = token_content(parser, row, start);
 		add_token(&parser->token, token);
 	}
-	else if ((parser->column - column) && is_delimiter(row[parser->column]))
+	else if ((parser->column - col) && is_delimiter(row[parser->column]))
 	{
-		token->data = get_token_content(parser, row, start);
+		token->data = token_content(parser, row, start);
 		if (token->type == INDIRECT)
 			token->type = (is_register(token->data)) ? REGISTER : OPERATOR;
 		add_token(&parser->token, token);
 	}
 	else
-		lexical_error(parser);
+		error_lex(parser);
 }
 
-void	parse_num(t_parser *parser,
-					char *row,
-					unsigned start,
-					t_token *token)
+void	parse_num(t_parser* parser,
+					char* row,
+					unsigned int start,
+					t_token* token)
 {
-	unsigned column;
+	unsigned int col;
 
 	token->column = start;
 	if (row[parser->column] == '-')
 		parser->column++;
-	column = parser->column;
+	col = parser->column;
 	while (ft_isdigit(row[parser->column]))
 		parser->column++;
-	if ((parser->column - column)
+	if ((parser->column - col)
 		&& (token->type == DIRECT || is_delimiter(row[parser->column])))
 	{
-		token->data = get_token_content(parser, row, start);
+		token->data = token_content(parser, row, start);
 		add_token(&parser->token, token);
 	}
 	else if (token->type != DIRECT)
@@ -61,20 +75,31 @@ void	parse_num(t_parser *parser,
 
 void		parse_token(t_parser *parser, char **line)
 {
-	if (line[parser->column] == SEPARATOR_CHAR && ++parser->column)
-		add_token(&parser->token, init_token(parser, SEPARATOR));
-	//else if (line[parser->column] == '\"')
-		//parse_string( , init_token(parser, STRING));
-	else if (line[parser->column] == NEW_LINE)
-		add_token(&parser->token, init_token(parser, NEW_LINE));
-	else if (*(*line + parser->column) == DIRECT_CHAR && ++parser->column)
+	if (*(*row + parser->column) == SEPARATOR_CHAR && ++parser->column)
+		add_token(&parser->tokens, init_token(parser, SEPARATOR));
+	else if (*(*row + parser->column) == '.')
+		parse_symbols(parser, *row,
+			parser->column++, init_token(parser, COMMAND));
+	else if (*(*row + parser->column) == '\"')
+		parse_str(parser, row, parser->column, init_token(parser, STRING));
+	else if (*(*row + parser->column) == '\n' && ++parser->column)
+		add_token(&parser->tokens, init_token(parser, NEW_LINE));
+	else if (*(*row + parser->column) == LABEL_CHAR)
+		parse_symbols(parser, *row, parser->column++,
+					init_token(parser, INDIRECT_LABEL));
+	else if (*(*row + parser->column) == DIRECT_CHAR && ++parser->column)
 	{
-		if (*(*line + parser->column) == LABEL_CHAR && ++parser->column)
-			parse_symbols(parser, *line, parser->column - 2, init_token(parser, DIRECT_LABEL));
+		if (*(*row + parser->column) == LABEL_CHAR && ++parser->column)
+			parse_symbols(parser, *row, 
+				parser->column - 2, init_token(parser, DIRECT_LABEL));
 		else
-			parse_num(parser, *line, parser->column - 1, init_token(parser, DIRECT));
-	}	
+			parse_num(parser, *row,
+				parser->column - 1, init_token(parser, DIRECT));
+	}
+	else
+		parse_num(parser, *row, parser->column, init_token(parser, INDIRECT));
 }
+
 void		parse_asm(t_parser *parser)
 {
 	size_t	size;
@@ -87,7 +112,7 @@ void		parse_asm(t_parser *parser)
 		ft_printf("%d %s", size, line);
 		while(line[parser->column])
 		{
-			skip_whitespaces(parser, line);
+			skip_whitespaces(line, parser);
 			skip_comment(parser, line);
 			if (line[parser->column])
 				parse_token(parser, &line);

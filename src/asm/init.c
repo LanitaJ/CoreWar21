@@ -18,12 +18,13 @@ t_token		*init_token(t_parser *parser, t_type type)
 
 	if (!(token = (t_token *)ft_memalloc(sizeof(t_token))))
 		exit(1);//сделать обработку
-	token->next = NULL;
-	token->type = type;
 	token->row = parser->row;
+	token->data = NULL;
 	if (type == SEPARATOR || type == NEW_LINE)
 		token->column = parser->column - 1;
 	else
 		token->column = parser->column;
+	token->next = NULL;
+	token->type = type;
 	return (token);
 }
