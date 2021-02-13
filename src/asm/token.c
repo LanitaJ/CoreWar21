@@ -25,3 +25,12 @@ void		add_token(t_token **chain, t_token *new)
 		}
 	}
 }
+
+char	*token_content(t_parser *parser, const char *row, unsigned start)
+{
+	char	*cnt;
+
+	if (!(cnt = ft_strsub(row, start, parser->column - start)))
+		kill("ERROR: Initializing string error");
+	return (cnt);
+}

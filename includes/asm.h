@@ -1,5 +1,6 @@
 #include "../ft_printf/includes/ft_printf.h"
 #include "op.h"
+# include <errno.h>
 
 # define MAX_STATEMENT_SIZE 14
 
@@ -61,9 +62,18 @@ t_parser				*init_parser(int fd);
 void					parse_asm(t_parser *parser);
 t_token					*init_token(t_parser *parser, t_type type);
 void					add_token(t_token **chain, t_token *new);
-int						is_whitespace(int c);
-void					skip_whitespaces(t_parser *parser, const char *row);
+void					skip_whitespaces(const char *row, t_parser *parser);
 void					skip_comment(t_parser *parser, const char *row);
 int						is_register(const char *arg);
+int						is_delimiter(int c);
+int						is_whitespace(int c);
 void					error_fd(void);
 void					error_malloc(void);
+void					kill(char *s);
+char					*token_content(t_parser *parser, const char *row, unsigned start);
+int						get_row(const int fd, char **row);
+
+void					error_lex(t_parser *parser);
+void					upgrade_row(char **row, char *ptr);
+
+char					*ft_strchrs(const char *s, int c);

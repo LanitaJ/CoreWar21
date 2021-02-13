@@ -34,12 +34,22 @@ int		is_register(const char *arg)
 	int	i;
 
 	i = 0;
-	if (ft_strlen(arg) >= 2 && ft_strlen(arg) <= 3 && arg[i] == REG_CHAR)
+	if ( ft_strlen(arg) < 4 && ft_strlen(arg) > 1 && arg[i] == REG_CHAR)
 	{
 		i++;
 		while (ft_isdigit(arg[i]))
 			i++;
-		return (!arg[i] && ft_atoi(&arg[1]) > 0);
+		return (ft_atoi(&arg[1]) > 0 && !arg[i]);
 	}
 	return (0);
+}
+
+void	upgrade_row(char **row, char *ptr)
+{
+	char *new;
+
+	if (!(new = ft_strdup(ptr)))
+		kill("ERROR: Initializing string error");
+	ft_strdel(row);
+	*row = new;
 }

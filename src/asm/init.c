@@ -17,7 +17,7 @@ t_token		*init_token(t_parser *parser, t_type type)
 	t_token	*token;
 
 	if (!(token = (t_token *)ft_memalloc(sizeof(t_token))))
-		exit(1);//сделать обработку
+		kill("Error: Can`t init token");
 	token->row = parser->row;
 	token->data = NULL;
 	if (type == SEPARATOR || type == NEW_LINE)
