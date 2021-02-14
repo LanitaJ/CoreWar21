@@ -242,6 +242,12 @@ void					error_malloc(void);
 void					kill(char *s);
 char					*token_content(t_parser *parser, const char *row, unsigned start);
 int						get_row(const int fd, char **row);
+void					parse_num(t_parser *parser, char* row, unsigned int start, t_token* token);
+void					parse_string(t_parser *parser, char **row, unsigned start, t_token *token);
+void					parse_symbols(t_parser *parser, char *row, unsigned start, t_token *token);
+void					update_parser_position(t_parser *parser, const char *row);
+char					*join_str(char **str1, char **str2);
+char					*get_token_content(t_parser *parser, const char *row, unsigned start);
 
 void					error_lex(t_parser *parser);
 void					upgrade_row(char **row, char *ptr);
