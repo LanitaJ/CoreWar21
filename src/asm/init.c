@@ -28,3 +28,32 @@ t_token		*init_token(t_parser *parser, t_type type)
 	token->type = type;
 	return (token);
 }
+
+t_label		*init_label(char *name, int op_pos)
+{
+	t_label	*label;
+
+	if (!(label = (t_label *)ft_memalloc(sizeof(t_label))))
+		kill("Error: Can`t init label");
+	if (!(label->name = ft_strdup(name)))
+		kill("ERROR: Initializing string error");
+	label->op_pos = op_pos;
+	label->mentions = NULL;
+	label->next = NULL;
+	return (label);
+}
+
+t_mention	*init_mention(t_parser *parser, t_token *token, size_t size)
+{
+	t_mention	*mention;
+
+	if (!(mention = (t_mention *)ft_memalloc(sizeof(t_mention))))
+		kill("Error: Can`t init mention");
+	mention->row = token->row;
+	mention->column = token->column;
+	mention->pos = parser->pos;
+	mention->op_pos = parser->op_pos;
+	mention->size = size;
+	mention->next = NULL;
+	return (mention);
+}

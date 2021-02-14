@@ -63,14 +63,14 @@ void	parse_symbols(t_parser *parser, char *row, unsigned start, t_token *token)
 	{
 		token->type = LABEL;
 		token->data = token_content(parser, row, start);
-		add_token(&parser->token, token);
+		add_token(&parser->tokens, token);
 	}
 	else if (is_delimiter(row[parser->column]) && parser->column - col)
 	{
 		token->data = token_content(parser, row, start);
 		if (token->type == INDIRECT)
 			token->type = (is_register(token->data)) ? REGISTER : OPERATOR;
-		add_token(&parser->token, token);
+		add_token(&parser->tokens, token);
 	}
 	else
 		error_lex(parser);
@@ -90,7 +90,7 @@ void	parse_num(t_parser* parser, char* row, unsigned int start, t_token* token)
 		&& (token->type == DIRECT || is_delimiter(row[parser->column])))
 	{
 		token->data = token_content(parser, row, start);
-		add_token(&parser->token, token);
+		add_token(&parser->tokens, token);
 	}
 	else if (token->type != DIRECT)
 	{
@@ -122,20 +122,20 @@ void	parse_string(t_parser *parser, char **row, unsigned start, t_token *token)
 	if (end - parser->column != *row)
 		upgrade_row(row, end - parser->column);
 	parser->column++;
-	add_token(&parser->token, token);
+	add_token(&parser->tokens, token);
 }
 
 void		parse_token(t_parser *parser, char **line)
 {
 	if (*(*line + parser->column) == SEPARATOR_CHAR && ++parser->column)
-		add_token(&parser->token, init_token(parser, SEPARATOR));
+		add_token(&parser->tokens, init_token(parser, SEPARATOR));
 	else if (*(*line + parser->column) == '.')
 		parse_symbols(parser, *line,
 			parser->column++, init_token(parser, COMMAND));
 	else if (*(*line + parser->column) == '\"')
 		parse_string(parser, line, parser->column, init_token(parser, STRING));
 	else if (*(*line + parser->column) == '\n' && ++parser->column)
-		add_token(&parser->token, init_token(parser, NEW_LINE));
+		add_token(&parser->tokens, init_token(parser, NEW_LINE));
 	else if (*(*line + parser->column) == LABEL_CHAR)
 		parse_symbols(parser, *line, parser->column++,
 					init_token(parser, INDIRECT_LABEL));
@@ -171,5 +171,5 @@ void		parse_asm(t_parser *parser)
 	}
 	if (size == -1)
 		kill("ERROR: Can\'t read file");
-	add_token(&(parser->token), init_token(parser, END));
+	add_token(&(parser->tokens), init_token(parser, END));
 }
