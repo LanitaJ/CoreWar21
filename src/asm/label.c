@@ -18,9 +18,9 @@ void	add_label(t_label **list, t_label *new)
 	}
 }
 
-void	add_mention(t_mention **list, t_mention *new)
+void	add_tag(t_tag **list, t_tag *new)
 {
-	t_mention	*cur;
+	t_tag	*cur;
 
 	if (list)
 	{
@@ -50,10 +50,10 @@ t_label	*find_label(t_label *list, char *name)
 	return (label);
 }
 
-void	replace_mentions(t_parser *file)
+void	replace_tags(t_parser *file)
 {
 	t_label		*label;
-	t_mention	*mention;
+	t_tag	*tag;
 
 	label = file->labels;
 	while (label)
@@ -62,17 +62,17 @@ void	replace_mentions(t_parser *file)
 			label_error(label);
 		else
 		{
-			mention = label->mentions;
-			while (mention)
+			tag = label->tag;
+			while (tag)
 			{
-				if (mention->size == 2)
-					int32_to_bytecode(file->code, mention->pos,
-									(int16_t)(label->op_pos - mention->op_pos),
-									mention->size);
+				if (tag->size == 2)
+					int32_to_bytecode(file->code, tag->pos,
+									(int16_t)(label->op_pos - tag->op_pos),
+									tag->size);
 				else
-					int32_to_bytecode(file->code, mention->pos,
-									label->op_pos - mention->op_pos, mention->size);
-				mention = mention->next;
+					int32_to_bytecode(file->code, tag->pos,
+									label->op_pos - tag->op_pos, tag->size);
+				tag = tag->next;
 			}
 		}
 		label = label->next;

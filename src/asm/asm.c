@@ -17,20 +17,15 @@ int		check_name(char *filename)
 	int len;
 
 	len = ft_strlen(filename);
-	if (filename && filename[len - 2] == '.' && filename[len - 1] == 's')
-		return (1);
-	else
-		return (0);
+	return (filename && filename[len - 2] == '.' && filename[len - 1] == 's') ? 1 : 0;
 }
 
-char	*replace_extension(char *filename, char *old, char *new)
+char	*make_out_file(char *filename, char *old_expansion, char *new_expansion)
 {
 	char	*basename;
 
-	basename = ft_strsub(filename, 0, ft_strlen(filename) - ft_strlen(old));
-	if (!basename)
-		kill("ERROR: Initializing string error");
-	if (!(filename = ft_strjoin(basename, new)))
+	basename = ft_strsub(filename, 0, ft_strlen(filename) - ft_strlen(old_expansion));
+	if (!basename || !(filename = ft_strjoin(basename, new_expansion)))
 		kill("ERROR: Initializing string error");
 	ft_strdel(&basename);
 	return (filename);
@@ -47,13 +42,14 @@ void	assemble(char *filename)
 	parser = init_parser(fd);
 	parse_asm(parser);
 	cur = parser->tokens;
-	process_info(parser, &cur);
-	process_asm_code(parser, &cur);
-	replace_mentions(parser);
-	filename = replace_extension(filename, ".s", ".cor");
+	asm_comment_name(parser, &cur);
+	asm_code(parser, &cur);
+	replace_tags(parser);
+	filename = make_out_file(filename, ".s", ".cor");
 	if ((fd = open(filename, O_CREAT | O_TRUNC | O_WRONLY, 0644)) == -1)
 		kill("ERROR: Can\'t create file");
 	write_bytecode_file(fd, parser);
+	free_asm_parser(&parser);
 }
 
 void	print_help(void)

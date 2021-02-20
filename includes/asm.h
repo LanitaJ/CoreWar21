@@ -4,10 +4,6 @@
 
 # define MAX_STATEMENT_SIZE 14
 
-# define REG_CHAR 'r'
-
-# define COMMAND_CHAR '.'
-
 typedef enum
 {
 	false,
@@ -64,21 +60,21 @@ typedef struct	s_op
 	uint8_t		t_dir_size;
 }				t_op;
 
-typedef struct			s_mention
+typedef struct			s_tag
 {
 	unsigned			row;
 	unsigned			column;
 	int32_t				pos;
 	int32_t				op_pos;
 	size_t				size;
-	struct s_mention	*next;
-}						t_mention;
+	struct s_tag	*next;
+}						t_tag;
 
 typedef struct			s_label
 {
 	char				*name;
 	int32_t				op_pos;
-	t_mention			*mentions;
+	t_tag			*tag;
 	struct s_label		*next;
 }						t_label;
 
@@ -253,19 +249,19 @@ void					error_lex(t_parser *parser);
 void					upgrade_row(char **row, char *ptr);
 
 t_label					*init_label(char *name, int op_pos);
-t_mention				*init_mention(t_parser *parser, t_token *token, size_t size);
+t_tag				*init_tag(t_parser *parser, t_token *token, size_t size);
 
-void					process_info(t_parser *parser, t_token **cur);
-void					process_asm_code(t_parser *parser, t_token **cur);
-int8_t					process_arg(t_parser *parser, t_token **current, t_op *op, int arg_num);
-void					replace_mentions(t_parser *file);
+void					asm_comment_name(t_parser *parser, t_token **cur);
+void					asm_code(t_parser *parser, t_token **cur);
+int8_t					asm_arg(t_parser *parser, t_token **cur, t_op *op, int arg_num);
+void					replace_tags(t_parser *file);
 void					int32_to_bytecode(char *data, int32_t pos, int32_t value, size_t size);
 void					write_bytecode_file(int fd, t_parser *parser);
 void					update_types_code(int8_t *types_code, int8_t type, int arg_num);
 t_op					*get_op(char *name);
 void					update_code_buff(t_parser *parser);
 void					add_label(t_label **list, t_label *new);
-void					add_mention(t_mention **list, t_mention *new);
+void					add_tag(t_tag **list, t_tag *new);
 t_label					*find_label(t_label *list, char *name);
 
 void					label_error(t_label *label);
@@ -274,5 +270,6 @@ void					operator_error(t_token *token);
 void					name_error();
 void					comment_error();
 void					arg_type_error(t_op *op, int arg_num, t_token *token);
+void					free_asm_parser(t_parser **parser);
 
 char					*ft_strchrs(const char *s, int c);

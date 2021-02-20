@@ -12,7 +12,7 @@ static int8_t	get_arg_type(t_type type)
 		return (0);
 }
 
-static void		process_mention(t_parser *parser, t_token *cur, t_op *op)
+static void		asm_tags(t_parser *parser, t_token *cur, t_op *op)
 {
 	t_label		*label;
 	char		*name;
@@ -30,11 +30,11 @@ static void		process_mention(t_parser *parser, t_token *cur, t_op *op)
 		add_label(&(parser->labels), label);
 	}
 	ft_strdel(&name);
-	add_mention(&label->mentions, init_mention(parser, cur, size));
+	add_tag(&label->tag, init_tag(parser, cur, size));
 	parser->pos += size;
 }
 
-static void		process_num(t_parser *parser, t_token *cur, t_op *op)
+static void		asm_num(t_parser *parser, t_token *cur, t_op *op)
 {
 	unsigned	start;
 	size_t		size;
@@ -48,7 +48,7 @@ static void		process_num(t_parser *parser, t_token *cur, t_op *op)
 	parser->pos += size;
 }
 
-static void		process_register(t_parser *parser, t_token *cur)
+static void		asm_register(t_parser *parser, t_token *cur)
 {
 	int32_to_bytecode(parser->code,
 					parser->pos,
@@ -57,7 +57,7 @@ static void		process_register(t_parser *parser, t_token *cur)
 	parser->pos += 1;
 }
 
-int8_t			process_arg(t_parser *parser,
+int8_t			asm_arg(t_parser *parser,
 							  t_token **cur,
 							  t_op *op,
 							  int arg_num)
@@ -69,12 +69,12 @@ int8_t			process_arg(t_parser *parser,
 		arg_type_error(op, arg_num, *cur);
 	if ((*cur)->type == INDIRECT_LABEL
 		|| (*cur)->type == DIRECT_LABEL)
-		process_mention(parser, *cur, op);
+		asm_tags(parser, *cur, op);
 	else if ((*cur)->type == INDIRECT
 			 || (*cur)->type == DIRECT)
-		process_num(parser, *cur, op);
+		asm_num(parser, *cur, op);
 	else
-		process_register(parser, *cur);
+		asm_register(parser, *cur);
 	return (type);
 }
 

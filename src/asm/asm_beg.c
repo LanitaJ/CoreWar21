@@ -1,6 +1,6 @@
 #include "../../includes/asm.h"
 
-static void	process_name(t_parser *parser, t_token **cur)
+static void	asm_name(t_parser *parser, t_token **cur)
 {
 	if ((*cur)->type == STRING)
 	{
@@ -15,7 +15,7 @@ static void	process_name(t_parser *parser, t_token **cur)
 		token_error(*cur);
 }
 
-static void	process_comment(t_parser *parser, t_token **cur)
+static void	asm_comment(t_parser *parser, t_token **cur)
 {
 	if ((*cur)->type == STRING)
 	{
@@ -30,25 +30,25 @@ static void	process_comment(t_parser *parser, t_token **cur)
 		token_error(*cur);
 }
 
-void		process_info(t_parser *parser, t_token **cur)
+void		asm_comment_name(t_parser *parser, t_token **cur)
 {
 	while (!parser->name || !parser->comment)
 	{
 		if ((*cur)->type == COMMAND
-			&& !parser->name
-			&& !ft_strcmp((*cur)->data, ".name"))
+			&& !ft_strcmp((*cur)->data, ".name")
+			&& !parser->name)
 		{
 			(*cur) = (*cur)->next;
-			process_name(parser, cur);
+			asm_name(parser, cur);
 			if ((*cur)->type != NEW_LINE)
 				token_error(*cur);
 		}
 		else if ((*cur)->type == COMMAND
-				 && !parser->comment
-				 && !ft_strcmp((*cur)->data, ".comment"))
+				 && !ft_strcmp((*cur)->data, ".comment")
+				 && !parser->comment)
 		{
 			(*cur) = (*cur)->next;
-			process_comment(parser, cur);
+			asm_comment(parser, cur);
 			if ((*cur)->type != NEW_LINE)
 				token_error(*cur);
 		}

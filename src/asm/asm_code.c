@@ -1,6 +1,6 @@
 #include "../../includes/asm.h"
 
-static void		process_label(t_parser *parser, t_token **cur)
+static void		asm_label(t_parser *parser, t_token **cur)
 {
 	t_label	*label;
 	char	*name;
@@ -14,7 +14,7 @@ static void		process_label(t_parser *parser, t_token **cur)
 	ft_strdel(&name);
 }
 
-static int8_t	process_args(t_parser *parser, t_token **cur, t_op *op)
+static int8_t	asm_args(t_parser *parser, t_token **cur, t_op *op)
 {
 	int		arg_num;
 	int8_t	types_code;
@@ -26,7 +26,7 @@ static int8_t	process_args(t_parser *parser, t_token **cur, t_op *op)
 	{
 		if ((*cur)->type >= REGISTER && (*cur)->type <= INDIRECT_LABEL)
 		{
-			type = process_arg(parser, cur, op, arg_num);
+			type = asm_arg(parser, cur, op, arg_num);
 			update_types_code(&types_code, type, arg_num);
 			(*cur) = (*cur)->next;
 		}
@@ -42,7 +42,7 @@ static int8_t	process_args(t_parser *parser, t_token **cur, t_op *op)
 	return (types_code);
 }
 
-static void		process_operator(t_parser *parser, t_token **cur)
+static void		asm_operator(t_parser *parser, t_token **cur)
 {
 	t_op	*op;
 	int8_t	types_code;
@@ -53,7 +53,7 @@ static void		process_operator(t_parser *parser, t_token **cur)
 		(*cur) = (*cur)->next;
 		if (op->args_types_code)
 			parser->pos++;
-		types_code = process_args(parser, cur, op);
+		types_code = asm_args(parser, cur, op);
 		if (op->args_types_code)
 			parser->code[parser->op_pos + 1] = types_code;
 	}
@@ -61,23 +61,23 @@ static void		process_operator(t_parser *parser, t_token **cur)
 		operator_error((*cur));
 }
 
-void			process_asm_code(t_parser *parser, t_token **current)
+void			asm_code(t_parser *parser, t_token **cur)
 {
-	while ((*current)->type != END)
+	while ((*cur)->type != END)
 	{
 		if (parser->pos >= parser->code_size)
 			update_code_buff(parser);
 		parser->op_pos = parser->pos;
-		if ((*current)->type == LABEL)
+		if ((*cur)->type == LABEL)
 		{
-			process_label(parser, current);
-			(*current) = (*current)->next;
+			asm_label(parser, cur);
+			(*cur) = (*cur)->next;
 		}
-		if ((*current)->type == OPERATOR)
-			process_operator(parser, current);
-		if ((*current)->type == NEW_LINE)
-			(*current) = (*current)->next;
+		if ((*cur)->type == OPERATOR)
+			asm_operator(parser, cur);
+		if ((*cur)->type == NEW_LINE)
+			(*cur) = (*cur)->next;
 		else
-			token_error((*current));
+			token_error((*cur));
 	}
 }

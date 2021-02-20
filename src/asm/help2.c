@@ -20,8 +20,8 @@ void	skip_whitespaces(const char *row, t_parser *parser)
 
 void	skip_comment(t_parser *parser, const char *row)
 {
-	if (row[parser->column] == COMMENT_CHAR
-		|| row[parser->column] == ALT_COMMENT_CHAR)
+	if (row[parser->column] == '#'
+		|| row[parser->column] == ';')
 		while (row[parser->column] && row[parser->column] != '\n')
 			parser->column++;
 }

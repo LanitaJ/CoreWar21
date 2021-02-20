@@ -47,14 +47,14 @@ void	arg_type_error(t_op *op, int arg_num, t_token *token)
 
 void	label_error(t_label *label)
 {
-	t_mention	*mention;
+	t_tag	*tag;
 
-	ft_printf("Undeclared label \"%s\" is mentioned at:\n", label->name);
-	mention = label->mentions;
-	while (mention)
+	ft_printf("Undeclared label \"%s\" is taged at:\n", label->name);
+	tag = label->tag;
+	while (tag)
 	{
-		ft_printf("\t— [%03u:%03u]\n", mention->row, mention->column + 1);
-		mention = mention->next;
+		ft_printf("\t— [%03u:%03u]\n", tag->row, tag->column + 1);
+		tag = tag->next;
 	}
 	exit(1);
 }

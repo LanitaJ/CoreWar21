@@ -24,7 +24,7 @@ void	parse_symbols(t_parser *parser,
 	while (row[parser->column]
 		&& ft_strchr(LABEL_CHARS, row[parser->column]))
 		parser->column++;
-	if ((parser->column - column) && row[parser->column] == LABEL_CHAR
+	if ((parser->column - column) && row[parser->column] == ':'
 		&& ++parser->column)
 	{
 		token->data = get_token_content(parser, row, start);

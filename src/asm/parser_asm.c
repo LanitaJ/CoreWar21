@@ -23,7 +23,7 @@ void	kill(char *s)
 
 void		parse_token(t_parser *parser, char **line)
 {
-	if (*(*line + parser->column) == SEPARATOR_CHAR && ++parser->column)
+	if (*(*line + parser->column) == ',' && ++parser->column)
 		add_token(&parser->tokens, init_token(parser, SEPARATOR));
 	else if (*(*line + parser->column) == '.')
 		parse_symbols(parser, *line, \
@@ -32,12 +32,12 @@ void		parse_token(t_parser *parser, char **line)
 		parse_string(parser, line, parser->column, init_token(parser, STRING));
 	else if (*(*line + parser->column) == '\n' && ++parser->column)
 		add_token(&parser->tokens, init_token(parser, NEW_LINE));
-	else if (*(*line + parser->column) == LABEL_CHAR)
+	else if (*(*line + parser->column) == ':')
 		parse_symbols(parser, *line, parser->column++,
 					init_token(parser, INDIRECT_LABEL));
-	else if (*(*line + parser->column) == DIRECT_CHAR && ++parser->column)
+	else if (*(*line + parser->column) == '%' && ++parser->column)
 	{
-		if (*(*line + parser->column) == LABEL_CHAR && ++parser->column)
+		if (*(*line + parser->column) == ':' && ++parser->column)
 			parse_symbols(parser, *line, 
 				parser->column - 2, init_token(parser, DIRECT_LABEL));
 		else
